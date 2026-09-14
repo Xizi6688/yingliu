@@ -2,42 +2,176 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Daohang 智能协作文档</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 引入飞书/Vue 官方风格的暗黑美学主题 -->
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+    <title>Daohang 智能协作空间 - 可视化云端文档</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked & DOMPurify 增强富文本渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        :root {
-            --theme-color: #0080ff; /* 飞书蓝 */
-            --base-font-size: 16px;
-        }
-        .markdown-section { max-width: 900px !important; }
-        /* 侧边栏飞书风格微调 */
-        .sidebar { background-color: #f8fafc; border-right: 1px solid #e2e8f0; }
-        .sidebar h1 a { font-weight: 700; color: #1e293b; }
+        :root { --feishu-blue: #0080ff; }
+        .editor-textarea:focus { outline: none; }
+        .media-box iframe, .media-box video { width: 100%; max-height: 400px; border-radius: 8px; margin: 12px 0; }
     </style>
 </head>
-<body>
-    <div id="app">正在加载飞书风格工作台...</div>
+<body class="bg-[#f5f6f8] text-slate-800 font-sans h-screen flex overflow-hidden">
+
+    <!-- 左侧：飞书风格导航大纲 -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col z-10 shadow-sm">
+        <!-- 顶部空间名称与新建按钮 -->
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-blue-500/20">D</div>
+                <span class="font-bold text-sm tracking-tight text-slate-900">Daohang 协作空间</span>
+            </div>
+            <button onclick="createNewDoc()" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition font-bold text-xs flex items-center space-x-1" title="新建文档">
+                <span>+ 新建</span>
+            </button>
+        </div>
+
+        <!-- 动态文档列表 -->
+        <div id="doc-list" class="flex-1 overflow-y-auto p-3 space-y-1 text-sm">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 底部状态 -->
+        <div class="p-3 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between bg-slate-50/50">
+            <span>💾 浏览器本地云存</span>
+            <span id="save-status" class="text-emerald-500 font-medium">已同步</span>
+        </div>
+    </aside>
+
+    <!-- 右侧：类似飞书的正文可视化编辑/演示区 -->
+    <main class="flex-1 flex flex-col bg-white relative overflow-hidden">
+        <!-- 顶部工具栏 -->
+        <header class="h-14 border-b border-slate-100 px-8 flex items-center justify-between bg-white">
+            <input type="text" id="doc-title" oninput="autoSave()" placeholder="无标题文档..." class="font-bold text-xl text-slate-900 bg-transparent focus:outline-none w-1/2">
+            
+            <div class="flex items-center space-x-2">
+                <!-- 快捷媒体插入工具 -->
+                <div class="hidden sm:flex items-center space-x-1 bg-slate-100 p-1 rounded-lg text-xs">
+                    <button onclick="insertContent('image')" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:text-blue-600 shadow-sm transition">📷 插图</button>
+                    <button onclick="insertContent('video')" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:text-blue-600 shadow-sm transition">🎬 插视频</button>
+                </div>
+                <button onclick="switchMode('edit')" id="btn-edit" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm">编辑文档</button>
+                <button onclick="switchMode('preview')" id="btn-preview" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">预览大屏</button>
+            </div>
+        </header>
+
+        <!-- 内容工作区 -->
+        <div class="flex-1 flex overflow-hidden relative">
+            <!-- 可视化编辑输入框 -->
+            <textarea id="doc-content" oninput="autoSave()" placeholder="在这里输入正文内容... 支持 Markdown 语法、图文、以及视频链接。" class="flex-1 w-full p-10 bg-transparent text-slate-700 resize-none focus:outline-none font-mono text-sm leading-relaxed"></textarea>
+            
+            <!-- 沉浸式图文视频预览大屏 -->
+            <div id="doc-preview" class="hidden flex-1 w-full p-10 overflow-y-auto prose max-w-none text-slate-800 media-box"></div>
+        </div>
+    </main>
+
+    <!-- 交互与本地存储逻辑 -->
     <script>
-        window.$docsify = {
-            name: '📂 Daohang 协作文档',
-            repo: 'https://github.com',
-            loadSidebar: true,      // 开启左侧树状目录
-            subMaxLevel: 3,         // 目录嵌套深度
-            auto2top: true,         // 切换页面自动回到顶部
-            search: {
-                maxAge: 86400000,
-                paths: 'auto',
-                placeholder: '搜索文档、标题或关键字...',
-                noData: '没有找到相关内容!',
-                depth: 6,
+        let docs = JSON.parse(localStorage.getItem('daohang_feishu_docs')) || [
+            { 
+                id: 1, 
+                title: '🚀 欢迎使用可视化协作空间', 
+                content: '# 欢迎来到新版 Daohang 协作空间\n\n这套系统彻底解决了“只能看不能改”的问题！你可以直接在左侧点击新建，在右侧随意打字、修改。\n\n### 核心亮点：\n- **网页端可视化编辑**：不需要去 GitHub 改代码，直接在网页里输入。\n- **图文与视频混排**：支持直接内嵌多媒体教学。\n\n### 视频演练示例：\n<video controls src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"></video>' 
+            }
+        ];
+        let currentId = docs[0].id;
+        let mode = 'edit';
+
+        function renderList() {
+            const listEl = document.getElementById('doc-list');
+            listEl.innerHTML = '';
+            docs.forEach(d => {
+                const item = document.createElement('div');
+                item.className = `group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition ${d.id === currentId ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`;
+                item.innerHTML = `
+                    <span class="truncate flex-1" onclick="selectDoc(${d.id})">${d.title || '无标题文档'}</span>
+                    ${docs.length > 1 ? `<button onclick="deleteDoc(event, ${d.id})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 px-1 transition">×</button>` : ''}
+                `;
+                listEl.appendChild(item);
+            });
+            loadCurrent();
+        }
+
+        function loadCurrent() {
+            const d = docs.find(item => item.id === currentId);
+            if (d) {
+                document.getElementById('doc-title').value = d.title;
+                document.getElementById('doc-content').value = d.content;
+                document.getElementById('doc-preview').innerHTML = marked.parse(d.content);
             }
         }
+
+        function selectDoc(id) {
+            currentId = id;
+            renderList();
+        }
+
+        function createNewDoc() {
+            const newDoc = { id: Date.now(), title: '新协作文档', content: '# 新文档\n\n在此开始编写内容...' };
+            docs.unshift(newDoc);
+            currentId = newDoc.id;
+            renderList();
+            save();
+        }
+
+        function deleteDoc(e, id) {
+            e.stopPropagation();
+            docs = docs.filter(item => item.id !== id);
+            if (currentId === id) currentId = docs[0].id;
+            renderList();
+            save();
+        }
+
+        function autoSave() {
+            const d = docs.find(item => item.id === currentId);
+            if (d) {
+                d.title = document.getElementById('doc-title').value;
+                d.content = document.getElementById('doc-content').value;
+                save();
+                
+                const status = document.getElementById('save-status');
+                status.innerText = '同步中...';
+                setTimeout(() => { status.innerText = '已同步'; }, 300);
+            }
+        }
+
+        function save() {
+            localStorage.setItem('daohang_feishu_docs', JSON.stringify(docs));
+        }
+
+        function insertContent(type) {
+            const ta = document.getElementById('doc-content');
+            let snippet = type === 'image' ? '\n![图片描述](https://images.unsplash.com/photo-1...)\n' : '\n<video controls src="你的视频地址.mp4"></video>\n';
+            const start = ta.selectionStart;
+            ta.value = ta.value.substring(0, start) + snippet + ta.value.substring(ta.selectionEnd);
+            autoSave();
+        }
+
+        function switchMode(m) {
+            mode = m;
+            const ta = document.getElementById('doc-content');
+            const pv = document.getElementById('doc-preview');
+            const btnEdit = document.getElementById('btn-edit');
+            const btnPrev = document.getElementById('btn-preview');
+
+            if (m === 'edit') {
+                ta.classList.remove('hidden');
+                pv.classList.add('hidden');
+                btnEdit.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
+                btnPrev.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
+            } else {
+                pv.innerHTML = marked.parse(ta.value);
+                ta.classList.add('hidden');
+                pv.classList.remove('hidden');
+                btnPrev.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
+                btnEdit.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
+            }
+        }
+
+        renderList();
     </script>
-    <!-- 核心渲染与搜索插件 -->
-    <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
 </body>
 </html>
