@@ -1,65 +1,43 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <title>Daohang 智能协作文档</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daohang Docs - 极速开源知识库</title>
-    <!-- 引入炫酷的 Tailwind 样式 -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入飞书/Vue 官方风格的暗黑美学主题 -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+    <style>
+        :root {
+            --theme-color: #0080ff; /* 飞书蓝 */
+            --base-font-size: 16px;
+        }
+        .markdown-section { max-width: 900px !important; }
+        /* 侧边栏飞书风格微调 */
+        .sidebar { background-color: #f8fafc; border-right: 1px solid #e2e8f0; }
+        .sidebar h1 a { font-weight: 700; color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div id="app">正在加载飞书风格工作台...</div>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: { bg: '#0b0f19', card: '#111827' }
-                }
+        window.$docsify = {
+            name: '📂 Daohang 协作文档',
+            repo: 'https://github.com',
+            loadSidebar: true,      // 开启左侧树状目录
+            subMaxLevel: 3,         // 目录嵌套深度
+            auto2top: true,         // 切换页面自动回到顶部
+            search: {
+                maxAge: 86400000,
+                paths: 'auto',
+                placeholder: '搜索文档、标题或关键字...',
+                noData: '没有找到相关内容!',
+                depth: 6,
             }
         }
     </script>
-</head>
-<body class="bg-[#0b0f19] text-slate-100 font-sans min-h-screen flex flex-col antialiased">
-
-    <!-- 顶部导航 -->
-    <header class="border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/80">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/30">D</div>
-                <span class="font-extrabold tracking-wider text-lg text-white">DAOHANG DOCS</span>
-            </div>
-            <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">✨ 运行正常</span>
-        </div>
-    </header>
-
-    <!-- 主体内容 -->
-    <main class="max-w-5xl mx-auto px-6 py-12 flex-1 grid grid-cols-1 md:grid-cols-4 gap-10 w-full">
-        <!-- 左侧菜单 -->
-        <aside class="space-y-2 hidden md:block text-sm">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">文档导航</div>
-            <a href="#intro" class="block px-3 py-2 rounded-lg bg-indigo-600/15 text-indigo-400 font-medium border border-indigo-500/20">🚀 快速导览</a>
-            <a href="#video" class="block px-3 py-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition">🎬 视频演示教程</a>
-            <a href="#faq" class="block px-3 py-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition">❓ 常见问题</a>
-        </aside>
-
-        <!-- 右侧正文 -->
-        <section class="md:col-span-3 space-y-8">
-            <div class="p-8 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-                <h1 class="text-3xl font-black text-white">欢迎使用大厂级开源文档</h1>
-                <p class="text-slate-400 text-sm leading-relaxed">这是一个专为小白打造的零编译、零报错、秒级上线的现代化开源文档系统。完美集成图文、视频演示与多媒体交互。</p>
-            </div>
-
-            <!-- 视频演示区块 -->
-            <div id="video" class="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
-                <h2 class="text-xl font-bold text-white">🎬 视频演示操作区</h2>
-                <p class="text-xs text-slate-400">你可以在这里直接观看或展示多媒体视频教程：</p>
-                <div class="rounded-xl overflow-hidden border border-slate-800 aspect-video bg-black">
-                    <video controls class="w-full h-full object-cover" src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-600">
-        <p>© 2026 Daohang. Hosted on Cloudflare Pages.</p>
-    </footer>
+    <!-- 核心渲染与搜索插件 -->
+    <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
 </body>
 </html>
