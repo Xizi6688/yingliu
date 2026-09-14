@@ -3,186 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daohang Workspace - 语雀风格 Markdown 知识库</title>
-    <!-- Tailwind CSS -->
+    <title>Daohang 官方帮助中心 - 协作文档</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Marked.js 解析 Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Highlight.js 代码高亮 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.8.0/build/styles/github-dark.min.css">
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.8.0/build/highlight.min.js"></script>
-    <style>
-        .yuque-content h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #1f2329; border-bottom: 1px solid #f0f0f1; padding-bottom: 0.5rem; }
-        .yuque-content h2 { font-size: 1.4rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #262626; }
-        .yuque-content p { margin-bottom: 1rem; line-height: 1.8; color: #374151; }
-        .yuque-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .yuque-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .yuque-content blockquote { border-left: 4px solid #2563eb; padding-left: 1rem; color: #6b7280; margin: 1rem 0; background: #f8fafc; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .yuque-content img, .yuque-content video { max-width: 100%; border-radius: 8px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    </style>
 </head>
-<body class="bg-[#f7f8fa] text-slate-800 font-sans h-screen flex overflow-hidden">
-
-    <!-- 左侧：语雀/飞书风格的多级目录侧边栏 -->
-    <aside class="w-72 bg-white border-r border-slate-200/80 flex flex-col z-10 shadow-sm">
-        <!-- 头部空间信息 -->
-        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-500/20">📖</div>
-                <div>
-                    <h1 class="font-bold text-sm text-slate-900 leading-tight">Daohang 知识库</h1>
-                    <p class="text-[10px] text-slate-400">Markdown 专有空间</p>
-                </div>
-            </div>
-            <button onclick="createNewNote()" class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition font-bold text-xs" title="新建文档">
-                + 新建
-            </button>
-        </div>
-
-        <!-- 目录列表 -->
-        <div id="notes-list" class="flex-1 overflow-y-auto p-3 space-y-1 text-sm">
-            <!-- 动态生成 -->
-        </div>
-
-        <!-- 底部状态 -->
-        <div class="p-3 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between bg-slate-50/50">
-            <span>✨ 客户端安全存盘</span>
-            <span id="sync-status" class="text-emerald-500 font-medium">已同步</span>
-        </div>
-    </aside>
-
-    <!-- 右侧：类似语雀的大屏沉浸式工作台 -->
-    <main class="flex-1 flex flex-col bg-white overflow-hidden">
-        <!-- 顶部工具栏 -->
-        <header class="h-14 border-b border-slate-100 px-8 flex items-center justify-between bg-white">
-            <input type="text" id="note-title" oninput="autoSave()" placeholder="无标题文档..." class="font-bold text-xl text-slate-900 bg-transparent focus:outline-none w-1/2">
-            
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+    <!-- 顶部导航 -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <!-- 格式快捷插入 -->
-                <div class="hidden sm:flex items-center space-x-1 bg-slate-100 p-1 rounded-lg text-xs">
-                    <button onclick="insertMd('image')" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:text-emerald-600 shadow-sm">📷 插图</button>
-                    <button onclick="insertMd('video')" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:text-emerald-600 shadow-sm">🎬 插视频</button>
-                </div>
-                <button onclick="switchView('edit')" id="btn-edit" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition shadow-sm">Markdown 编辑</button>
-                <button onclick="switchView('preview')" id="btn-preview" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">预览大屏</button>
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">📖</div>
+                <span class="font-bold text-lg text-slate-900">Daohang 官方知识库</span>
             </div>
-        </header>
+            <!-- 作者专属管理后台入口 -->
+            <a href="/admin/" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white hover:bg-blue-600 transition shadow-sm">
+                ⚙️ 作者登录后台
+            </a>
+        </div>
+    </header>
 
-        <!-- 编辑与预览主区域 -->
-        <div class="flex-1 flex overflow-hidden relative">
-            <!-- Markdown 源码编辑区 -->
-            <textarea id="note-content" oninput="autoSave()" placeholder="# 在这里写点什么... 支持完整 Markdown 语法、图文、视频" class="flex-1 w-full p-10 bg-transparent text-slate-700 resize-none focus:outline-none font-mono text-sm leading-relaxed"></textarea>
-            
-            <!-- 语雀风格沉浸式预览大屏 -->
-            <div id="note-preview" class="hidden flex-1 w-full p-12 overflow-y-auto yuque-content max-w-4xl mx-auto"></div>
+    <!-- 主体公开浏览区 -->
+    <main class="max-w-4xl mx-auto px-6 py-12 flex-1 w-full space-y-8">
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h1 class="text-3xl font-black text-slate-900">欢迎访问公开文档中心</h1>
+            <p class="text-slate-600 leading-relaxed">这里是面向所有访客的只读知识库。所有内容均由作者在后台通过 Markdown 实时维护，全球 CDN 加速发布。</p>
+        </div>
+
+        <!-- 文章列表区 -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold text-slate-900">📑 最新公开文档</h2>
+            <div id="article-list" class="grid gap-4">
+                <!-- 动态读取 -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 transition cursor-pointer">
+                    <h3 class="font-bold text-lg text-slate-900 mb-1">🚀 示例：如何使用本系统</h3>
+                    <p class="text-xs text-slate-500">发布于 2026-03-30 · 点击进入阅读正文</p>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- 逻辑脚本 -->
-    <script>
-        let notes = JSON.parse(localStorage.getItem('daohang_yuque_notes')) || [
-            {
-                id: 1,
-                title: '🚀 欢迎使用 Markdown 知识库',
-                content: '# 欢迎来到你的专属知识库\n\n这套系统完美复刻了**语雀与飞书**的树状大纲目录，并且底层全面倾向于 **Markdown 语法**。\n\n## 核心亮点：\n- **左侧多级目录**：清晰管理你的个人笔记与项目文档。\n- **可视化 Markdown 编辑**：在右侧随时增删改查，支持图片与视频多媒体混排。\n\n### 视频演练演示：\n<video controls src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"></video>'
-            }
-        ];
-        let currentId = notes[0].id;
-        let currentView = 'edit';
-
-        function renderList() {
-            const listEl = document.getElementById('notes-list');
-            listEl.innerHTML = '';
-            notes.forEach(n => {
-                const item = document.createElement('div');
-                item.className = `group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition ${n.id === currentId ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`;
-                item.innerHTML = `
-                    <span class="truncate flex-1" onclick="selectNote(${n.id})">${n.title || '无标题文档'}</span>
-                    ${notes.length > 1 ? `<button onclick="deleteNote(event, ${n.id})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 px-1 transition">×</button>` : ''}
-                `;
-                listEl.appendChild(item);
-            });
-            loadCurrent();
-        }
-
-        function loadCurrent() {
-            const n = notes.find(item => item.id === currentId);
-            if (n) {
-                document.getElementById('note-title').value = n.title;
-                document.getElementById('note-content').value = n.content;
-                document.getElementById('note-preview').innerHTML = marked.parse(n.content);
-            }
-        }
-
-        function selectNote(id) {
-            currentId = id;
-            renderList();
-        }
-
-        function createNewNote() {
-            const newN = { id: Date.now(), title: '新 Markdown 文档', content: '# 新文档\n\n在此开始编写内容...' };
-            notes.unshift(newN);
-            currentId = newN.id;
-            renderList();
-            save();
-        }
-
-        function deleteNote(e, id) {
-            e.stopPropagation();
-            notes = notes.filter(item => item.id !== id);
-            if (currentId === id) currentId = notes[0].id;
-            renderList();
-            save();
-        }
-
-        function autoSave() {
-            const n = notes.find(item => item.id === currentId);
-            if (n) {
-                n.title = document.getElementById('note-title').value;
-                n.content = document.getElementById('note-content').value;
-                save();
-                
-                const status = document.getElementById('sync-status');
-                status.innerText = '同步中...';
-                setTimeout(() => { status.innerText = '已同步'; }, 300);
-            }
-        }
-
-        function save() {
-            localStorage.setItem('daohang_yuque_notes', JSON.stringify(notes));
-        }
-
-        function insertMd(type) {
-            const ta = document.getElementById('note-content');
-            let snippet = type === 'image' ? '\n![图片描述](https://images.unsplash.com/photo-1...)\n' : '\n<video controls src="你的视频直链.mp4"></video>\n';
-            const start = ta.selectionStart;
-            ta.value = ta.value.substring(0, start) + snippet + ta.value.substring(ta.selectionEnd);
-            autoSave();
-        }
-
-        function switchView(view) {
-            currentView = view;
-            const ta = document.getElementById('note-content');
-            const pv = document.getElementById('note-preview');
-            const btnEdit = document.getElementById('btn-edit');
-            const btnPrev = document.getElementById('btn-preview');
-
-            if (view === 'edit') {
-                ta.classList.remove('hidden');
-                pv.classList.add('hidden');
-                btnEdit.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition shadow-sm";
-                btnPrev.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
-            } else {
-                pv.innerHTML = marked.parse(ta.value);
-                document.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
-                ta.classList.add('hidden');
-                pv.classList.remove('hidden');
-                btnPrev.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition shadow-sm";
-                btnEdit.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
-            }
-        }
-
-        renderList();
-    </script>
+    <footer class="border-t border-slate-200 py-6 text-center text-xs text-slate-400 bg-white">
+        <p>© 2026 Daohang. Powered by Decap CMS & Cloudflare Pages.</p>
+    </footer>
 </body>
 </html>
