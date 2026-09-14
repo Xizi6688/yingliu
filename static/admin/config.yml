@@ -1,0 +1,17 @@
+backend:
+  name: github
+  repo: Xizi6688/yingliu   # ⚠️ 注意改成你自己的 GitHub 账号和仓库名（例如：zhangsan/my-docs）
+  branch: main                      # 默认分支，通常是 main 或 master
+
+media_folder: "static/images"       # 上传的图片默认保存路径
+public_folder: "/images"
+
+collections:
+  - name: "docs"
+    label: "语雀知识库"
+    folder: "content/docs"          # 你的 Markdown 文章存放的文件夹
+    create: true                    # 允许在后台新建文章
+    fields:
+      - {label: "文章标题", name: "title", widget: "string"}
+      - {label: "发布日期", name: "date", widget: "datetime"}
+      - {label: "正文内容 (Markdown)", name: "body", widget: "markdown"}
